@@ -118,7 +118,7 @@ class GameReplyMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return GameReplyMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
@@ -161,7 +161,7 @@ class OrderMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return OrderMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
@@ -203,7 +203,7 @@ class GuessMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return GuessMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
@@ -257,7 +257,7 @@ class ResultMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return ResultMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
@@ -326,7 +326,7 @@ class AcknowledgeMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return AcknowledgeMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
@@ -375,7 +375,7 @@ class ErrorMessage(BaseSubmarinesMessage):
         :return: the message's type identifier
         """
 
-        return GameRequestMessage.MESSAGE_TYPE
+        return ErrorMessage.MESSAGE_TYPE
 
     def encode(self) -> bytes:
         """
