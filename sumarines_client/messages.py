@@ -306,3 +306,46 @@ class ResultMessage(BaseSubmarinesMessage):
         """
 
         return bool(self.submarine_size) + self.did_sink + self.did_sink_last
+
+
+class AcknowledgeMessage(BaseSubmarinesMessage):
+    """
+    The result's ack message
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.ACKNOWLEDGE
+
+    def __init__(self, result_code: int):
+        self.result_code = result_code
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (not including headers)
+
+        :return: the encoded message in bytes
+        """
+
+        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, self.result_code)
+        return encoded_message
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (not including headers)
+        :return: The message instance
+        """
+
+        result, = struct.unpack(constants.ProtocolFormats.RESULT_CODE_FORMAT, data)
+        return cls(result_code=result)
