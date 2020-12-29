@@ -6,7 +6,7 @@ from abc import ABCMeta, abstractmethod
 import enum
 import struct
 
-from sumarines_client import constants
+from sumarines_client import constants, exceptions
 
 
 @enum.unique
@@ -349,3 +349,65 @@ class AcknowledgeMessage(BaseSubmarinesMessage):
 
         result, = struct.unpack(constants.ProtocolFormats.RESULT_CODE_FORMAT, data)
         return cls(result_code=result)
+
+
+class ErrorMessage(BaseSubmarinesMessage):
+    """
+    The error message
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.ERROR
+
+    ERROR_CODES_TO_EXCEPTIONS = {
+        constants.ErrorCode.GENERIC_ERROR: exceptions.GenericException,
+        constants.ErrorCode.ALREADY_ATTACKED_ERROR: exceptions.AlreadyAttackedException,
+        constants.ErrorCode.INVALID_COORDINATE_ERROR: exceptions.InvalidCoordinateException
+    }
+
+    def __init__(self, error_code: constants):
+        self.error_code = error_code
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (not including headers)
+
+        :return: the encoded message in bytes
+        """
+
+        encoded_message = struct.pack(constants.ProtocolFormats.ERROR_CODE_FORMAT, self.error_code)
+        return encoded_message
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (not including headers)
+        :return: The message instance
+        """
+
+        error_code, = struct.unpack(constants.ProtocolFormats.ERROR_CODE_FORMAT, data)
+        return cls(error_code=error_code)
+
+    @property
+    def exception(self) -> exceptions.ErrorMessageException:
+        """
+        Get the exception corresponding to the error code
+
+        :return: the exception corresponding to the error code
+        """
+
+        return ErrorMessage.ERROR_CODES_TO_EXCEPTIONS.get(
+            self.error_code,
+            exceptions.GenericException
+        )

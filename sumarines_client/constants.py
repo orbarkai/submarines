@@ -21,6 +21,8 @@ class ProtocolFormats:
     RESULT_CODE_FORMAT = 'B'
     SUBMARINE_SIZE_FORMAT = 'B'
 
+    ERROR_CODE_FORMAT = 'B'
+
 
 @enum.unique
 class SubmarineSize(enum.IntEnum):
@@ -29,3 +31,10 @@ class SubmarineSize(enum.IntEnum):
     SUBMARINE_THREE = 3
     SUBMARINE_FOUR = 4
     SUBMARINE_FIVE = 5
+
+
+@enum.unique
+class ErrorCode(enum.IntEnum):
+    GENERIC_ERROR = 0
+    ALREADY_ATTACKED_ERROR = 1
+    INVALID_COORDINATE_ERROR = 2
