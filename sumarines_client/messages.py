@@ -5,6 +5,8 @@ This module has all the protocol's message types
 from abc import ABCMeta, abstractmethod
 import enum
 
+from sumarines_client import protocol_utils
+
 
 @enum.unique
 class SubmarineMessageType(enum.IntEnum):
@@ -54,3 +56,45 @@ class BaseSubmarinesMessage(metaclass=ABCMeta):
         """
 
         raise NotImplemented()
+
+
+class GameRequestMessage(metaclass=ABCMeta):
+    """
+    The initial game request message
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.GAME_REQUEST
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (including magic and version)
+
+        :return: the encoded message in bytes
+        """
+
+        encoded_headers = protocol_utils.encode_headers(self.get_message_type())
+        return encoded_headers
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (including magic and version)
+        :return: The message instance
+        """
+
+        return cls()
