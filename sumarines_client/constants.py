@@ -4,8 +4,12 @@ These are generic submarines client constants
 
 import enum
 
+import messages
 
-class Magics:
+MAGIC_SIZE = 4
+
+
+class Magic(enum.Enum):
     VERSION_ONE_MAGIC = 'BS1p'
 
 
@@ -38,3 +42,15 @@ class ErrorCode(enum.IntEnum):
     GENERIC_ERROR = 0
     ALREADY_ATTACKED_ERROR = 1
     INVALID_COORDINATE_ERROR = 2
+
+
+class MessagesCodec:
+    MESSAGES_TYPES = {
+        messages.GameRequestMessage.get_message_type(): messages.GameRequestMessage,
+        messages.GameReplyMessage.get_message_type(): messages.GameReplyMessage,
+        messages.OrderMessage.get_message_type(): messages.OrderMessage,
+        messages.GuessMessage.get_message_type(): messages.GuessMessage,
+        messages.ResultMessage.get_message_type(): messages.ResultMessage,
+        messages.AcknowledgeMessage.get_message_type(): messages.AcknowledgeMessage,
+        messages.ErrorMessage.get_message_type(): messages.ErrorMessage,
+    }
