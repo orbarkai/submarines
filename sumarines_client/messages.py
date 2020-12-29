@@ -4,8 +4,9 @@ This module has all the protocol's message types
 
 from abc import ABCMeta, abstractmethod
 import enum
+import struct
 
-from sumarines_client import protocol_utils
+from sumarines_client import constants
 
 
 @enum.unique
@@ -38,7 +39,7 @@ class BaseSubmarinesMessage(metaclass=ABCMeta):
     @abstractmethod
     def encode(self) -> bytes:
         """
-        Encode the message into bytes by the protocol (including magic and version)
+        Encode the message into bytes by the protocol (not including headers)
 
         :return: the encoded message in bytes
         """
@@ -51,14 +52,14 @@ class BaseSubmarinesMessage(metaclass=ABCMeta):
         """
         Decode bytes to a message instance
 
-        :param data: The data you wish to encode (including magic and version)
+        :param data: The data you wish to encode (not including headers)
         :return: The message instance
         """
 
         raise NotImplemented()
 
 
-class GameRequestMessage(metaclass=ABCMeta):
+class GameRequestMessage(BaseSubmarinesMessage):
     """
     The initial game request message
     """
@@ -80,21 +81,63 @@ class GameRequestMessage(metaclass=ABCMeta):
 
     def encode(self) -> bytes:
         """
-        Encode the message into bytes by the protocol (including magic and version)
+        Encode the message into bytes by the protocol (not including headers)
 
         :return: the encoded message in bytes
         """
 
-        encoded_headers = protocol_utils.encode_headers(self.get_message_type())
-        return encoded_headers
+        return bytes()
 
     @classmethod
     def decode(cls, data: bytes):
         """
         Decode bytes to a message instance
 
-        :param data: The data you wish to encode (including magic and version)
+        :param data: The data you wish to encode (not including headers)
         :return: The message instance
         """
 
         return cls()
+
+
+class GameReplyMessage(BaseSubmarinesMessage):
+    """
+    The initial game request message
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.GAME_REPLY
+
+    def __init__(self, response: bool):
+        self.response = response
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (not including headers)
+
+        :return: the encoded message in bytes
+        """
+
+        encoded_message = struct.pack(constants.ProtocolFormats.RESPONSE_FORMAT, self.response)
+        return encoded_message
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (not including headers)
+        :return: The message instance
+        """
+
+        response, = struct.unpack(constants.ProtocolFormats.RESPONSE_FORMAT, data)
+        return cls(response=response)
