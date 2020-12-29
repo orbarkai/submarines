@@ -12,3 +12,6 @@ class ProtocolFormats:
     MESSAGE_TYPE_FORMAT = 'B'
 
     RESPONSE_FORMAT = '?'
+
+    COORDINATE_FORMAT = 'B'
+    COORDINATE_DELIMITER = 4

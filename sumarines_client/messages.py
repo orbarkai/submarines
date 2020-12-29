@@ -182,3 +182,53 @@ class OrderMessage(BaseSubmarinesMessage):
         """
 
         return cls()
+
+
+class GuessMessage(BaseSubmarinesMessage):
+    """
+    The player's guess message
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.GUESS
+
+    def __init__(self, row: int, column: int):
+        self.row = row
+        self.column = column
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (not including headers)
+
+        :return: the encoded message in bytes
+        """
+
+        coordinate = self.column % (2 ** constants.ProtocolFormats.COORDINATE_DELIMITER)
+        coordinate += (self.row << constants.ProtocolFormats.COORDINATE_DELIMITER)
+
+        encoded_message = struct.pack(constants.ProtocolFormats.COORDINATE_FORMAT, coordinate)
+
+        return encoded_message
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (not including headers)
+        :return: The message instance
+        """
+
+        coordinate, = struct.unpack(constants.ProtocolFormats.COORDINATE_FORMAT, data)
+        column = coordinate % (2 ** constants.ProtocolFormats.COORDINATE_DELIMITER)
+        row = coordinate >> constants.ProtocolFormats.COORDINATE_DELIMITER
+        return cls(row=row, column=column)
