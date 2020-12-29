@@ -266,8 +266,7 @@ class ResultMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        result_code = bool(self.submarine_size) + self.did_sink + self.did_sink_last
-        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, result_code)
+        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, self.result_code)
 
         if bool(self.submarine_size):
             encoded_message += struct.pack(constants.ProtocolFormats.SUBMARINE_SIZE_FORMAT, self.submarine_size)
@@ -297,3 +296,13 @@ class ResultMessage(BaseSubmarinesMessage):
             result_message.did_sink_last = True
 
         return result_message
+
+    @property
+    def result_code(self) -> int:
+        """
+        Get the result code of the message
+
+        :return: the result code of the message
+        """
+
+        return bool(self.submarine_size) + self.did_sink + self.did_sink_last
