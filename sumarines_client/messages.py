@@ -232,3 +232,68 @@ class GuessMessage(BaseSubmarinesMessage):
         column = coordinate % (2 ** constants.ProtocolFormats.COORDINATE_DELIMITER)
         row = coordinate >> constants.ProtocolFormats.COORDINATE_DELIMITER
         return cls(row=row, column=column)
+
+
+class ResultMessage(BaseSubmarinesMessage):
+    """
+    The player's guess message's result
+    """
+
+    MESSAGE_TYPE = SubmarineMessageType.RESULT
+
+    def __init__(self, submarine_size: constants.SubmarineSize = constants.SubmarineSize.NO_SUBMARINE,
+                 did_sink: bool = False,
+                 did_sink_last: bool = False):
+
+        self.submarine_size = submarine_size
+        self.did_sink = did_sink
+        self.did_sink_last = did_sink_last
+
+    @staticmethod
+    def get_message_type() -> SubmarineMessageType:
+        """
+        Get the message's type identifier
+
+        :return: the message's type identifier
+        """
+
+        return GameRequestMessage.MESSAGE_TYPE
+
+    def encode(self) -> bytes:
+        """
+        Encode the message into bytes by the protocol (not including headers)
+
+        :return: the encoded message in bytes
+        """
+
+        result_code = bool(self.submarine_size) + self.did_sink + self.did_sink_last
+        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, result_code)
+
+        if bool(self.submarine_size):
+            encoded_message += struct.pack(constants.ProtocolFormats.SUBMARINE_SIZE_FORMAT, self.submarine_size)
+
+        return encoded_message
+
+    @classmethod
+    def decode(cls, data: bytes):
+        """
+        Decode bytes to a message instance
+
+        :param data: The data you wish to encode (not including headers)
+        :return: The message instance
+        """
+
+        result_code, = struct.unpack(constants.ProtocolFormats.RESULT_CODE_FORMAT, data[:1])
+        result_message = cls()
+
+        if result_code > 0:
+            submarine_size_value, = struct.unpack(constants.ProtocolFormats.SUBMARINE_SIZE_FORMAT, data[1:])
+            result_message.submarine_size = constants.SubmarineSize(submarine_size_value)
+
+        if result_code > 1:
+            result_message.did_sink = True
+
+        if result_code > 2:
+            result_message.did_sink_last = True
+
+        return result_message
