@@ -5,8 +5,9 @@ These are protocol utils (mostly encoding and decoding)
 import struct
 from typing import Tuple
 
-from sumarines_client import exceptions, constants
+from sumarines_client import exceptions
 from sumarines_client.messages import SubmarineMessageType
+from sumarines_client.constants import Protocol
 
 
 def calc_headers_size() -> int:
@@ -18,13 +19,13 @@ def calc_headers_size() -> int:
 
     headers_size = 0
 
-    headers_size += constants.MAGIC_SIZE
-    headers_size += struct.calcsize(constants.ProtocolFormats.MESSAGE_TYPE_FORMAT)
+    headers_size += Protocol.MAGIC_SIZE
+    headers_size += struct.calcsize(Protocol.Formats.MESSAGE_TYPE_FORMAT)
 
     return headers_size
 
 
-def encode_headers(message_type: SubmarineMessageType, version_magic: constants.Magic) -> bytes:
+def encode_headers(message_type: SubmarineMessageType, version_magic: Protocol.Magic) -> bytes:
     """
     Encode the headers of the message
 
@@ -36,12 +37,12 @@ def encode_headers(message_type: SubmarineMessageType, version_magic: constants.
     encoded_headers = bytes()
 
     encoded_headers += version_magic.value.encode()
-    encoded_headers += struct.pack(constants.ProtocolFormats.MESSAGE_TYPE_FORMAT, message_type)
+    encoded_headers += struct.pack(Protocol.Formats.MESSAGE_TYPE_FORMAT, message_type)
 
     return encoded_headers
 
 
-def decode_headers(message: bytes) -> Tuple[constants.Magic, SubmarineMessageType]:
+def decode_headers(message: bytes) -> Tuple[Protocol.Magic, SubmarineMessageType]:
     """
     Decode the headers of a message
 
@@ -54,10 +55,10 @@ def decode_headers(message: bytes) -> Tuple[constants.Magic, SubmarineMessageTyp
         raise exceptions.InvalidHeadersException('The message\'s headers are not provided')
 
     encoded_headers = message[:calc_headers_size()]
-    headers_format = f'{constants.ProtocolFormats.MAGIC_FORMAT}{constants.ProtocolFormats.MESSAGE_TYPE_FORMAT}'
+    headers_format = f'{Protocol.Formats.MAGIC_FORMAT}{Protocol.Formats.MESSAGE_TYPE_FORMAT}'
     encoded_magic, message_type_value = struct.unpack(headers_format, encoded_headers)
 
-    magic: constants.Magic = constants.Magic(encoded_magic.decode())
+    magic: Protocol.Magic = Protocol.Magic(encoded_magic.decode())
     message_type: SubmarineMessageType = SubmarineMessageType(message_type_value)
 
     return magic, message_type

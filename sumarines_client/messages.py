@@ -6,7 +6,8 @@ from abc import ABCMeta, abstractmethod
 import enum
 import struct
 
-from sumarines_client import constants, exceptions
+from sumarines_client import exceptions
+from sumarines_client.constants import Protocol
 
 
 @enum.unique
@@ -127,7 +128,7 @@ class GameReplyMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        encoded_message = struct.pack(constants.ProtocolFormats.RESPONSE_FORMAT, self.response)
+        encoded_message = struct.pack(Protocol.Formats.RESPONSE_FORMAT, self.response)
         return encoded_message
 
     @classmethod
@@ -139,7 +140,7 @@ class GameReplyMessage(BaseSubmarinesMessage):
         :return: The message instance
         """
 
-        response, = struct.unpack(constants.ProtocolFormats.RESPONSE_FORMAT, data)
+        response, = struct.unpack(Protocol.Formats.RESPONSE_FORMAT, data)
         return cls(response=response)
 
 
@@ -212,10 +213,10 @@ class GuessMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        coordinate = self.column % (2 ** constants.ProtocolFormats.COORDINATE_DELIMITER)
-        coordinate += (self.row << constants.ProtocolFormats.COORDINATE_DELIMITER)
+        coordinate = self.column % (2 ** Protocol.Formats.COORDINATE_DELIMITER)
+        coordinate += (self.row << Protocol.Formats.COORDINATE_DELIMITER)
 
-        encoded_message = struct.pack(constants.ProtocolFormats.COORDINATE_FORMAT, coordinate)
+        encoded_message = struct.pack(Protocol.Formats.COORDINATE_FORMAT, coordinate)
 
         return encoded_message
 
@@ -228,9 +229,9 @@ class GuessMessage(BaseSubmarinesMessage):
         :return: The message instance
         """
 
-        coordinate, = struct.unpack(constants.ProtocolFormats.COORDINATE_FORMAT, data)
-        column = coordinate % (2 ** constants.ProtocolFormats.COORDINATE_DELIMITER)
-        row = coordinate >> constants.ProtocolFormats.COORDINATE_DELIMITER
+        coordinate, = struct.unpack(Protocol.Formats.COORDINATE_FORMAT, data)
+        column = coordinate % (2 ** Protocol.Formats.COORDINATE_DELIMITER)
+        row = coordinate >> Protocol.Formats.COORDINATE_DELIMITER
         return cls(row=row, column=column)
 
 
@@ -241,7 +242,7 @@ class ResultMessage(BaseSubmarinesMessage):
 
     MESSAGE_TYPE = SubmarineMessageType.RESULT
 
-    def __init__(self, submarine_size: constants.SubmarineSize = constants.SubmarineSize.NO_SUBMARINE,
+    def __init__(self, submarine_size: Protocol.SubmarineSize = Protocol.SubmarineSize.NO_SUBMARINE,
                  did_sink: bool = False,
                  did_sink_last: bool = False):
 
@@ -266,10 +267,10 @@ class ResultMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, self.result_code)
+        encoded_message = struct.pack(Protocol.Formats.RESULT_CODE_FORMAT, self.result_code)
 
         if bool(self.submarine_size):
-            encoded_message += struct.pack(constants.ProtocolFormats.SUBMARINE_SIZE_FORMAT, self.submarine_size)
+            encoded_message += struct.pack(Protocol.Formats.SUBMARINE_SIZE_FORMAT, self.submarine_size)
 
         return encoded_message
 
@@ -282,12 +283,12 @@ class ResultMessage(BaseSubmarinesMessage):
         :return: The message instance
         """
 
-        result_code, = struct.unpack(constants.ProtocolFormats.RESULT_CODE_FORMAT, data[:1])
+        result_code, = struct.unpack(Protocol.Formats.RESULT_CODE_FORMAT, data[:1])
         result_message = cls()
 
         if result_code > 0:
-            submarine_size_value, = struct.unpack(constants.ProtocolFormats.SUBMARINE_SIZE_FORMAT, data[1:])
-            result_message.submarine_size = constants.SubmarineSize(submarine_size_value)
+            submarine_size_value, = struct.unpack(Protocol.Formats.SUBMARINE_SIZE_FORMAT, data[1:])
+            result_message.submarine_size = Protocol.SubmarineSize(submarine_size_value)
 
         if result_code > 1:
             result_message.did_sink = True
@@ -335,7 +336,7 @@ class AcknowledgeMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        encoded_message = struct.pack(constants.ProtocolFormats.RESULT_CODE_FORMAT, self.result_code)
+        encoded_message = struct.pack(Protocol.Formats.RESULT_CODE_FORMAT, self.result_code)
         return encoded_message
 
     @classmethod
@@ -347,7 +348,7 @@ class AcknowledgeMessage(BaseSubmarinesMessage):
         :return: The message instance
         """
 
-        result, = struct.unpack(constants.ProtocolFormats.RESULT_CODE_FORMAT, data)
+        result, = struct.unpack(Protocol.Formats.RESULT_CODE_FORMAT, data)
         return cls(result_code=result)
 
 
@@ -359,12 +360,12 @@ class ErrorMessage(BaseSubmarinesMessage):
     MESSAGE_TYPE = SubmarineMessageType.ERROR
 
     ERROR_CODES_TO_EXCEPTIONS = {
-        constants.ErrorCode.GENERIC_ERROR: exceptions.GenericException,
-        constants.ErrorCode.ALREADY_ATTACKED_ERROR: exceptions.AlreadyAttackedException,
-        constants.ErrorCode.INVALID_COORDINATE_ERROR: exceptions.InvalidCoordinateException
+        Protocol.ErrorCode.GENERIC_ERROR: exceptions.GenericException,
+        Protocol.ErrorCode.ALREADY_ATTACKED_ERROR: exceptions.AlreadyAttackedException,
+        Protocol.ErrorCode.INVALID_COORDINATE_ERROR: exceptions.InvalidCoordinateException
     }
 
-    def __init__(self, error_code: constants):
+    def __init__(self, error_code: Protocol.ErrorCode):
         self.error_code = error_code
 
     @staticmethod
@@ -384,7 +385,7 @@ class ErrorMessage(BaseSubmarinesMessage):
         :return: the encoded message in bytes
         """
 
-        encoded_message = struct.pack(constants.ProtocolFormats.ERROR_CODE_FORMAT, self.error_code)
+        encoded_message = struct.pack(Protocol.Formats.ERROR_CODE_FORMAT, self.error_code)
         return encoded_message
 
     @classmethod
@@ -396,7 +397,7 @@ class ErrorMessage(BaseSubmarinesMessage):
         :return: The message instance
         """
 
-        error_code, = struct.unpack(constants.ProtocolFormats.ERROR_CODE_FORMAT, data)
+        error_code, = struct.unpack(Protocol.Formats.ERROR_CODE_FORMAT, data)
         return cls(error_code=error_code)
 
     @property
