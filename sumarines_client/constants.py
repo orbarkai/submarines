@@ -4,8 +4,10 @@ These are generic submarines client constants
 
 import enum
 
+MAGIC_SIZE = 4
 
-class Magics:
+
+class Magic(enum.Enum):
     VERSION_ONE_MAGIC = 'BS1p'
 
 
@@ -38,3 +40,4 @@ class ErrorCode(enum.IntEnum):
     GENERIC_ERROR = 0
     ALREADY_ATTACKED_ERROR = 1
     INVALID_COORDINATE_ERROR = 2
+
