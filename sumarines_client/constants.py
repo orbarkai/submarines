@@ -4,6 +4,8 @@ These are generic submarines client constants
 
 import enum
 
+LOGGER_NAME = 'submarines_client'
+
 
 class Protocol:
     MAGIC_SIZE = 4

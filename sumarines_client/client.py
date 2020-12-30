@@ -65,12 +65,14 @@ class BaseSubmarinesClient(metaclass=ABCMeta):
         raise NotImplementedError()
 
     @abstractmethod
-    def receive_message(self) -> messages.BaseSubmarinesMessage:
+    def receive_message(self, expected_type: SubmarineMessageType) -> messages.BaseSubmarinesMessage:
         """
         Receive a message from the connected player
 
+        :param expected_type: optional, an expected message type
         :return: The decoded message
         :raise NotConnectedError: No player is connected to the client
+        :raise ProtocolException: if the message is not expected type
         """
 
         raise NotImplementedError()
@@ -118,7 +120,7 @@ class TCPSubmarinesClient(BaseSubmarinesClient):
         self._messages_codec = messages_codec
         self._listening_socket = listening_socket
         self._game_socket = game_socket
-        self._logger = logging.getLogger('submarines_client')
+        self._logger = logging.getLogger(constants.LOGGER_NAME)
 
     @classmethod
     def listen(cls,
@@ -155,8 +157,7 @@ class TCPSubmarinesClient(BaseSubmarinesClient):
                 self._game_socket, address = self._listening_socket.accept()
 
                 # receive game request
-                game_request = self.receive_message()
-                protocol_utils.insure_message_type(game_request, SubmarineMessageType.GAME_REQUEST)
+                self.receive_message(SubmarineMessageType.GAME_REQUEST)
                 self._logger.info('Incoming game request: ', f'from {address}')
 
                 # send game reply
@@ -189,8 +190,7 @@ class TCPSubmarinesClient(BaseSubmarinesClient):
             self.send_message(messages.GameRequestMessage())
 
             # receive game reply
-            game_reply: messages.GameReplyMessage = self.receive_message()
-            protocol_utils.insure_message_type(game_reply, SubmarineMessageType.GAME_REPLY)
+            game_reply: messages.GameReplyMessage = self.receive_message(SubmarineMessageType.GAME_REPLY)
             return game_reply.response
         except exceptions.ProtocolException:
             raise
@@ -208,12 +208,14 @@ class TCPSubmarinesClient(BaseSubmarinesClient):
         encoded_message = self._messages_codec.encode_message(message)
         self._game_socket.send(encoded_message)
 
-    def receive_message(self) -> messages.BaseSubmarinesMessage:
+    def receive_message(self, expected_type: SubmarineMessageType = None) -> messages.BaseSubmarinesMessage:
         """
         Receive a message from the connected player
 
+        :param expected_type: optional, an expected message type
         :return: The decoded message
         :raise NotConnectedError: No player is connected to the client
+        :raise ProtocolException: if the message is not expected type
         """
 
         encoded_message = bytes()
@@ -229,7 +231,15 @@ class TCPSubmarinesClient(BaseSubmarinesClient):
 
                 new_data = self._game_socket.recv(constants.Network.BUFFER_SIZE)
 
-            return self._messages_codec.decode_message(encoded_message)
+            message = self._messages_codec.decode_message(encoded_message)
+
+            if message.get_message_type() == SubmarineMessageType.ERROR:
+                raise message.exception
+
+            if expected_type:
+                protocol_utils.insure_message_type(message, expected_type)
+
+            return message
 
         except exceptions.ProtocolException:
             raise
