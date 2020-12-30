@@ -4,8 +4,9 @@ The messages codec is responsible for encoding and decoding messages
 
 from abc import ABCMeta, abstractmethod
 
-from sumarines_client import protocol_utils, constants, exceptions
+from sumarines_client import protocol_utils, exceptions
 from sumarines_client import messages
+from sumarines_client.constants import Protocol
 
 
 class BaseMessagesCodec(metaclass=ABCMeta):
@@ -52,7 +53,7 @@ class MessagesCodec(BaseMessagesCodec):
         messages.ErrorMessage.get_message_type(): messages.ErrorMessage,
     }
 
-    def __init__(self, version_magic: constants.Magic = constants.Magic.VERSION_ONE_MAGIC):
+    def __init__(self, version_magic: Protocol.Magic = Protocol.Magic.VERSION_ONE_MAGIC):
         self._version_magic = version_magic
 
     def encode_message(self, message: messages.BaseSubmarinesMessage) -> bytes:
