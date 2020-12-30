@@ -21,3 +21,13 @@ class SubmarinesGame:
 
         self._client = client
         self._verbose = verbose
+        self._board = Board()
+
+    def do_turn(self) -> bool:
+        """
+        Do your turn, the method blocks until the other player finished all of his turns
+
+        :return: whether the game is over
+        """
+
+        raise NotImplementedError()
