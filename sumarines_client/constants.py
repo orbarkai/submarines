@@ -43,3 +43,6 @@ class Protocol:
 class Network:
 
     DEFAULT_PORT = 8300
+    PUBLIC_IP = '0.0.0.0'
+
+    BUFFER_SIZE = 1024

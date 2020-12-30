@@ -5,8 +5,8 @@ These are protocol utils (mostly encoding and decoding)
 import struct
 from typing import Tuple
 
-from sumarines_client import exceptions
-from sumarines_client.messages import SubmarineMessageType
+from sumarines_client import exceptions, constants
+from sumarines_client.messages import SubmarineMessageType, BaseSubmarinesMessage
 from sumarines_client.constants import Protocol
 
 
@@ -62,3 +62,20 @@ def decode_headers(message: bytes) -> Tuple[Protocol.Magic, SubmarineMessageType
     message_type: SubmarineMessageType = SubmarineMessageType(message_type_value)
 
     return magic, message_type
+
+
+def insure_message_type(message: BaseSubmarinesMessage, expected_message_type: SubmarineMessageType):
+    """
+    Raise a protocol error if the type of the message is unexpected
+
+    :param message: The incoming message
+    :param expected_message_type: The expected message type
+    :raise: ProtocolException: if the type of the message is unexpected
+    """
+
+    if expected_message_type != message.get_message_type():
+        raise exceptions.ProtocolException(f'Unexpected message type! '
+                                           f'expected {expected_message_type},'
+                                           f'got message.get_message_type()')
+
+    return True

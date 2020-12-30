@@ -108,7 +108,7 @@ class GameReplyMessage(BaseSubmarinesMessage):
 
     MESSAGE_TYPE = SubmarineMessageType.GAME_REPLY
 
-    def __init__(self, response: bool):
+    def __init__(self, response: bool = True):
         self.response = response
 
     @staticmethod
