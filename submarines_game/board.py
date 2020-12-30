@@ -5,6 +5,7 @@ A game board's functionality
 from submarines_game import constatns
 import numpy as np
 
+
 class Board:
     """
     The board keeps memory on all submarines.
