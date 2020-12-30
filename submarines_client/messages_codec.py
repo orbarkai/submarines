@@ -4,9 +4,9 @@ The messages codec is responsible for encoding and decoding messages
 
 from abc import ABCMeta, abstractmethod
 
-from sumarines_client import protocol_utils, exceptions
-from sumarines_client import messages
-from sumarines_client.constants import Protocol
+from submarines_client import protocol_utils, exceptions
+from submarines_client import messages
+from submarines_client.constants import Protocol
 
 
 class BaseMessagesCodec(metaclass=ABCMeta):

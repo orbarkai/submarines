@@ -2,7 +2,7 @@
 All the client's exceptions are in this module
 """
 
-from sumarines_client.constants import Protocol
+from submarines_client.constants import Protocol
 
 
 class SubmarinesClientException(Exception):
