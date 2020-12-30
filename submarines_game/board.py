@@ -38,3 +38,6 @@ class Board:
                         and self.tiles[column][y] == constatns.Board.NO_SUBMARINE:
 
                     self.tiles[column][y] = size
+
+    def __str__(self):
+        return ' ' + np.swapaxes(self.tiles, 0, 1).__str__()[1:-1]
