@@ -6,8 +6,8 @@ from abc import ABCMeta, abstractmethod
 import enum
 import struct
 
-from sumarines_client import exceptions
-from sumarines_client.constants import Protocol
+from submarines_client import exceptions
+from submarines_client.constants import Protocol
 
 
 @enum.unique

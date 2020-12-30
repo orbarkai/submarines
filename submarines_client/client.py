@@ -7,9 +7,9 @@ from abc import ABCMeta, abstractmethod
 import socket
 import logging
 
-from sumarines_client import messages, constants, exceptions, protocol_utils
-from sumarines_client.messages_codec import BaseMessagesCodec, MessagesCodec
-from sumarines_client.messages import SubmarineMessageType
+from submarines_client import messages, constants, exceptions, protocol_utils
+from submarines_client.messages_codec import BaseMessagesCodec, MessagesCodec
+from submarines_client.messages import SubmarineMessageType
 
 
 class BaseSubmarinesClient(metaclass=ABCMeta):
