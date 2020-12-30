@@ -5,9 +5,9 @@ These are protocol utils (mostly encoding and decoding)
 import struct
 from typing import Tuple
 
-from sumarines_client import exceptions, constants
-from sumarines_client.messages import SubmarineMessageType, BaseSubmarinesMessage
-from sumarines_client.constants import Protocol
+from submarines_client import exceptions, constants
+from submarines_client.messages import SubmarineMessageType, BaseSubmarinesMessage
+from submarines_client.constants import Protocol
 
 
 def calc_headers_size() -> int:
